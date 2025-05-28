@@ -1,0 +1,31 @@
+# 🛠️ Installation Guide
+
+This project uses **Jupyter Notebook** in an **Anaconda environment** to build a machine learning model that predicts Hansen Solubility Parameters (δd, δp, δh) using Lasso linear regression. It leverages cheminformatics and data science libraries such as RDKit, scikit-learn, pandas, and matplotlib.
+
+---
+
+## ⚙️ Environment Setup
+
+### 1. Install Anaconda
+
+First, install Anaconda from the [official site](https://docs.anaconda.com/anaconda/install/).
+
+---
+
+### 2. Create and Activate a New Conda Environment with RDKit
+
+Use the following command to create a dedicated environment:
+
+conda create -c conda-forge -n hansen-ml-env rdkit
+
+### 3.After installation of RDkit, activate the Rdkit environment using the following command
+
+conda activate my-rdkit-env 
+Within my-rdkit-env Install Scikit-learn
+
+conda install scikit-learn  
+Install Jupyternotebook 
+
+conda install -c conda-forge notebook  
+Install pytorch (documentation here)
+
