@@ -1,0 +1,126 @@
+from rdkit import Chem, DataStructs
+from rdkit.Chem import AllChem
+from rdkit.Chem import MACCSkeys
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.linear_model import Lasso
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.model_selection import LeaveOneOut, GridSearchCV
+from sklearn import preprocessing
+import numpy as np
+import sys
+import math
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+np.set_printoptions (threshold=sys.maxsize)
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all"
+
+
+# Reading Hansen and SMILES data from gpHSP
+gpHSP_data = pd.read_csv('C:/Users/Your_name_here/Desktop/Python/Solvents_exp.csv')
+mol_smiles gpHSP_data['smiles']
+mol_name gpHSP_data['key']
+hansen_d gpHSP_data['δd']
+hansen_p gpHSP_data['δρ']
+hansen_h gpHSP_data['δh']
+#generate fingeprints: Morgan fingerprint with radius 8
+fps = [AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(x), 8, nBits-1024) for x in gpHSP_data['smiles']]
+#Generate MACCS fingerprint
+maccs_fps [MACCSkeys.GenMACCSKeys (Chem. MolFromSmiles(x)) for x in gpHSP_data['smiles']]
+
+
+# read in charge density (signma profite)
+# pandas.Series.str.split can split the string over multiple Lines # str.split(pat"/") pat can be used to split by other characters (expand = True) the split elements will expand out into separate columns 
+# str.replace to get rid of at the end of some Lines
+sigma = pd.Series(gpHSP_data['sigma_profile']).str.replace("0.00000000e+00]', '0', regex=False)
+sigma split = sigma.str.split(expand-True)
+sigmap = sigma_split.iloc[:,1:62].astype('float32')
+#sigmap.shape
+
+# read in shape and size data
+size = gpHSP_data.loc[:, ['Molwt', 'Area', 'Volume"]]
+# read in electrostatics
+electro = gpHSP_data.loc[:, ['dipole', 'polar', 'sigma_norm', 'Hba', 'Hbd']]
+
+#convert the RDKit explicit vectors into numpy arrays 
+#Morgan and MACCS fingerprints
+np_fps = np.asarray (fps)
+#np_fps.shape
+#np_fps[0] [10:100]
+np_maccs_fps = np.asarray(maccs_fps)
+#np_maces_fps
+
+#Join all data arrays and standardization (scaled)
+np_all_original = np.concatenate((np_fps, np_maccs_fps, sigmap, size, electro), axis-1)
+np_all_original.shape
+np_all = preprocessing.scale(np_all_original)
+
+#split the targets into training/testing sets using LeaveOneOut
+#192 sets as training and 1 set as testing
+data = LeaveOneOut()
+data.get_n_splits (np_all)
+results_hansen_d_pred_lasso = []
+for train_index, test index in data.split(np_all):
+   #print ("TRAIN:", train index, "TEST:", test index)
+   np_all_train, np_all_test = np_all [train_index], np_all[test_index]
+   hansen_d_train, hansen_d_test hansen_d[train_index], hansen_d[test_index]
+   #print(np_fps_train, np_fps_test, hansen_d_train, hansen_d_test)
+   # we can only use predic on data that is of the same dimensionality
+   # as the training data was. When we want to predict using new value 
+   # using just one row, that row has to be reshaped to be part of another array.
+   np_all_test_reshape = np.array (np_all_test) 
+   np_all_test_reshape = np_all_test_reshape.reshape (1,-1)
+alpha 0.1
+   lasso Lasso(alpha-alpha)
+   hansen_d_pred_lasso = lasso.fit(np_all_train, hansen_d_train).predict(np_all_test_reshape)
+results_hansen_d_pred_lasso.append(hansen_d_pred_lasso[0])
+#print (hansen_d_pred_Lasso)
+
+len(results_hansen_h_pred_lasso) 
+type(results_hansen_h_pred_lasso)
+
+# MAE, AE and RMSE give an idea of the error distribution
+mean_absolute_error (hansen_d, results_hansen_d_pred_lasso)
+mean_absolute_error (hansen_p, results_hansen_p_pred_lasso)
+mean_absolute_error (hansen_h, results_hansen_h_pred_lasso)
+
+
+# RMSES
+math.sqrt(mean_squared_error(hansen_d, results_hansen_d_pred_lasso))
+math.sqrt(mean_squared_error(hansen_p, results_hansen_p_pred_lass0))
+math.sqrt(mean_squared_error(hansen_h, results_hansen_h_pred_lasso))
+# R^2 Coefficient of Determination
+# inform on the quality of the fit of each model
+# is a measure of how well the model can capture
+# the inherent variation of experimental data
+r2_score (hansen_d, results_hansen_d_pred_lasso)
+r2_score (hansen_p, results_hansen_p_pred_lasso)
+r2_score (hansen_h, results_hansen_h_pred_lasso)
+
+lasso_output = pd.concat((mol_name, hansen_d, hansen_p, hansen_h,
+	pd.Series (results_hansen_d_pred_lasso, name='pred_d'), 
+	pd.Series (results_hansen_p_pred_lasso, name='pred_p'), 	pd.Series(results_hansen_h_pred_lasso, name='pred_h') ), axis=1)
+
+
+plt.figure(3)
+#gca stands for get current axis
+#axplt.gca()
+#plt.axis([14, 28, 14, 28])
+ln = np.arange(14, 26, 0.2)
+lasso_output.plot(kind='scatter', x='6d", y='pred_d', color='red') plt.xlabel('exp. Hansen dipole')
+plt.plot(In, In, '--')
+plt.ylabel('pred. Hansen dipole')
+
+ln = np.arange(0, 25, 0.2) 
+lasso_output.plot(kind='scatter', x='p', y='pred_p', color = 'blue') plt.plot(In, In, '--')
+plt.xlabel('exp. Hansen polar') 
+plt.ylabel('pred. Hansen polar")
+
+ln = np.arange(0, 30, 0.2) 
+lasso_output.plot(kind='scatter", x='h', y='pred_h', color = 'green')
+plt.plot(In, In, '--') plt.xlabel('exp. Hansen hydrogen')
+plt.ylabel('pred. Hansen hydrogen')
