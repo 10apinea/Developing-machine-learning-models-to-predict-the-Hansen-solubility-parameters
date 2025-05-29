@@ -27,5 +27,5 @@ conda install scikit-learn
 Install Jupyternotebook 
 
 conda install -c conda-forge notebook  
-Install pytorch (documentation here)
+Install pytorch 
 
