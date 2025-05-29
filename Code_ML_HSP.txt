@@ -54,7 +54,7 @@ np_fps = np.asarray (fps)
 np_maccs_fps = np.asarray(maccs_fps)
 #np_maces_fps
 
-#Join all data arrays and standardization (scaled)
+#Join all data arrays and standardisation (scaled)
 np_all_original = np.concatenate((np_fps, np_maccs_fps, sigmap, size, electro), axis-1)
 np_all_original.shape
 np_all = preprocessing.scale(np_all_original)
@@ -65,7 +65,7 @@ data = LeaveOneOut()
 data.get_n_splits (np_all)
 results_hansen_d_pred_lasso = []
 for train_index, test index in data.split(np_all):
-   #print ("TRAIN:", train index, "TEST:", test index)
+   print ("TRAIN:", train index, "TEST:", test index)
    np_all_train, np_all_test = np_all [train_index], np_all[test_index]
    hansen_d_train, hansen_d_test hansen_d[train_index], hansen_d[test_index]
    #print(np_fps_train, np_fps_test, hansen_d_train, hansen_d_test)
@@ -103,7 +103,8 @@ r2_score (hansen_h, results_hansen_h_pred_lasso)
 
 lasso_output = pd.concat((mol_name, hansen_d, hansen_p, hansen_h,
 	pd.Series (results_hansen_d_pred_lasso, name='pred_d'), 
-	pd.Series (results_hansen_p_pred_lasso, name='pred_p'), 	pd.Series(results_hansen_h_pred_lasso, name='pred_h') ), axis=1)
+	pd.Series (results_hansen_p_pred_lasso, name='pred_p'), 	
+	pd.Series(results_hansen_h_pred_lasso, name='pred_h') ), axis=1)
 
 
 plt.figure(3)
